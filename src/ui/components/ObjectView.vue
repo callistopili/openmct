@@ -48,6 +48,15 @@ export default {
         },
         font() {
             return this.objectFontStyle ? this.objectFontStyle.font : this.layoutFont;
+        },
+        styleReceiver() {
+            let styleReceiver = this.$el.querySelector('.js-style-receiver');
+
+            if (!styleReceiver) {
+                styleReceiver = this.$el.querySelector(':first-child');
+            }
+
+            return styleReceiver;
         }
     },
     destroyed() {
@@ -117,15 +126,6 @@ export default {
 
             this.openmct.objectViews.off('clearData', this.clearData);
         },
-        getStyleReceiver() {
-            let styleReceiver = this.$el.querySelector('.js-style-receiver');
-
-            if (!styleReceiver) {
-                styleReceiver = this.$el.querySelector(':first-child');
-            }
-
-            return styleReceiver;
-        },
         invokeEditModeHandler(editMode) {
             let edit;
 
@@ -146,26 +146,23 @@ export default {
                 return;
             }
 
-            let keys = Object.keys(styleObj);
-            let elemToStyle = this.getStyleReceiver();
-
-            keys.forEach(key => {
-                if (elemToStyle) {
+            if (this.styleReceiver !== undefined) {
+                Object.keys(styleObj).forEach(key => {
                     if ((typeof styleObj[key] === 'string') && (styleObj[key].indexOf('__no_value') > -1)) {
-                        if (elemToStyle.style[key]) {
-                            elemToStyle.style[key] = '';
+                        if (this.styleReceiver.style[key]) {
+                            this.styleReceiver.style[key] = '';
                         }
                     } else {
-                        if (!styleObj.isStyleInvisible && elemToStyle.classList.contains(STYLE_CONSTANTS.isStyleInvisible)) {
-                            elemToStyle.classList.remove(STYLE_CONSTANTS.isStyleInvisible);
-                        } else if (styleObj.isStyleInvisible && !elemToStyle.classList.contains(styleObj.isStyleInvisible)) {
-                            elemToStyle.classList.add(styleObj.isStyleInvisible);
+                        if (!styleObj.isStyleInvisible && this.styleReceiver.classList.contains(STYLE_CONSTANTS.isStyleInvisible)) {
+                            this.styleReceiver.classList.remove(STYLE_CONSTANTS.isStyleInvisible);
+                        } else if (styleObj.isStyleInvisible && !this.styleReceiver.classList.contains(styleObj.isStyleInvisible)) {
+                            this.styleReceiver.classList.add(styleObj.isStyleInvisible);
                         }
 
-                        elemToStyle.style[key] = styleObj[key];
+                        this.styleReceiver.style[key] = styleObj[key];
                     }
-                }
-            });
+                });
+            }
         },
         updateView(immediatelySelect) {
             this.clear();
@@ -372,12 +369,14 @@ export default {
             return [browseObject, parentObject, this.domainObject].every(object => object && !object.locked);
         },
         setFontSize(newSize) {
-            let elemToStyle = this.getStyleReceiver();
-            elemToStyle.dataset.fontSize = newSize;
+            if (this.styleReceiver !== undefined) {
+                this.styleReceiver.dataset.fontSize = newSize;
+            }
         },
         setFont(newFont) {
-            let elemToStyle = this.getStyleReceiver();
-            elemToStyle.dataset.font = newFont;
+            if (this.styleReceiver !== undefined) {
+                this.styleReceiver.dataset.font = newFont;
+            }
         }
     }
 };
