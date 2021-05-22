@@ -50,13 +50,11 @@ export default {
             return this.objectFontStyle ? this.objectFontStyle.font : this.layoutFont;
         },
         styleReceiver() {
-            let styleReceiver = this.$el.querySelector('.js-style-receiver');
+            const styleReceiver = this.$el.querySelector('.js-style-receiver')
+                || this.$el.querySelector(':first-child');
 
-            if (!styleReceiver) {
-                styleReceiver = this.$el.querySelector(':first-child');
-            }
-
-            return styleReceiver;
+            // explicitly return undefined if falsy because querySelector returns null for no matches
+            return styleReceiver ? styleReceiver : undefined;
         }
     },
     destroyed() {
